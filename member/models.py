@@ -91,13 +91,6 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.member.first_name} {self.member.last_name} - {self.date}" """
-   
-class TotalAttendanceCount(models.Model):
-    date = models.DateField(unique=True)
-    total_count = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"Total Attendance Count: {self.total_count}"
     
 
 class Member(models.Model):
@@ -109,15 +102,28 @@ class Member(models.Model):
     # it does not auto update to True if all attendance entries are updated to True
     # but setting it as false it automatic
 
+    def __str__(self):
+        return f'{self.first_name } {self.last_name}'
 
 class Attendance(models.Model):
-    student = models.ForeignKey(Member, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField()
-    present = models.BooleanField(default=False)
+    status = models.BooleanField(default=False, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.present:
-            student = Member.objects.get(id=self.student.id)
-            student.perfect_attendance = False
-            student.save()
+        if not self.status:
+            member = Member.objects.get(id=self.member.id)
+            member.perfect_attendance = False
+            member.save()
         super(Attendance, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.member.first_name} {self.member.last_name} - {self.date}"
+    
+class TotalAttendanceCount(models.Model):
+    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField(unique=True)
+    total_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"Total Attendance Count: {self.total_count}"

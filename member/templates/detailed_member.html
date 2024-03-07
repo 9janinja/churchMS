@@ -7,6 +7,7 @@
 <div class="col-md-6 offset-md-3">
     <h1>{{ member }}</h1>
 </br>
+
         <div class="row justify-content-center">
             <div class="card col-6">
                 <div class='card-body'>
@@ -175,6 +176,17 @@
         </div>
     </div>
 </div>
+
+<h2>Attendance Record</h2>
+<ul>
+  {% for attendance in member.attendance_record %}
+    <li>
+      Date: {{ attendance.date }}
+      - Present: {{ attendance.status }}
+    </li>
+  {% endfor %}
+</ul>
+
 </br>
 <a href=" {% url 'member_list' %}" class='btn btn-secondary'>Back</a>
 <a href=" {% url 'delete_member' member.id %}" class='btn btn-danger'>Delete</a>

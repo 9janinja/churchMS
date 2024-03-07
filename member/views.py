@@ -14,19 +14,19 @@ from rest_framework import routers, serializers, viewsets, views
 
 
 from .forms import MembershipForm
-from .models import Member, Attendance
+from .models import Member, Attendance, TotalAttendanceCount
 
 # Create your views here.           
 
 def home(request):
     attendance_count = Attendance.objects.filter(date=timezone.now().date(), status=True).count()
-    first_timer_count = Member.objects.filter(status='First-Timer').count()
+    #first_timer_count = Member.objects.filter(status='First-Timer').count()
     total_member = Member.objects.count()
 
     
     context = {
         'attendance_count': attendance_count,
-        'firsttimer_count': first_timer_count,
+        #'firsttimer_count': first_timer_count,
         'total_member': total_member,
     }
     return render(request, 'home.html', context)
@@ -82,12 +82,10 @@ def edit_member(request, pk):
         messages.success(request, "You need to login ...")
         return redirect('member_list')      
 
-""" def attendance_list(request):
+def attendance_list(request):
     #get all attendance records to display on html
     attendance = Attendance.objects.all()
     current_date = timezone.now().date()
-    #attendance = Attendance.objects.filter(date=current_date).values_list('member__id', flat=True)
-    #attendance = Member.objects.filter(attendance__status=True)  # Optimize query
 
     return render(request, 'attendance_list.html', {'attendance': attendance})
 
@@ -116,11 +114,49 @@ def attendance_summary(request):
         'present_count': present_count,
     }
     
-    return render(request, 'attendance_summary.html', context) """
+    return render(request, 'attendance_summary.html', context)
+
+
+def total_attendance(request):
+    attendance = Attendance.objects.all()
+    current_date = timezone.now().date()
+
+    total_attendance = TotalAttendanceCount.objects.filter(date=current_date).values_list('attendance__id', flat=True)
+    
+    if request.method == 'POST':
+        for attendance in attendance:
+            #status = request.POST.get(str(attendance.id))
+            if attendance.id in total_attendance:
+                attendance_record = TotalAttendanceCount.objects.get(attendance=attendance, date=current_date)
+                #attendance_record.status = (status == 'present')
+                attendance_record.save()
+            else:
+                TotalAttendanceCount.objects.create(attendance=attendance, date=current_date)
+        return redirect('attendance_summary')
+    
+    return render(request, 'addAttendance.html', {'member': member})
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 
 # no separate serializerspy file since it's only 2 serializers
 # and adding another file only makes it difficult to navigate in this tiny MT
@@ -139,7 +175,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attendance
-        fields = ['id', 'member', 'member_name', 'date', 'present']
+        fields = ['id', 'member', 'member_name', 'date', 'status']
 
 
 class MemberDetailsSerializer(serializers.ModelSerializer):
@@ -169,7 +205,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):  # crud
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
 
-'''
+
 
 """ class ThreadingExampleView(views.APIView):
     """

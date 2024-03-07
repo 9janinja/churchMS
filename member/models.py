@@ -29,7 +29,7 @@ class Hop(models.Model):
         return f'{self.hop_name}'
 
 
-class Member(models.Model):
+""" class Member(models.Model):
 
     STATUS = (
         ('',''),
@@ -90,7 +90,7 @@ class Attendance(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.member.first_name} {self.member.last_name} - {self.date}"
+        return f"{self.member.first_name} {self.member.last_name} - {self.date}" """
    
 class TotalAttendanceCount(models.Model):
     date = models.DateField(unique=True)
@@ -98,3 +98,26 @@ class TotalAttendanceCount(models.Model):
 
     def __str__(self):
         return f"Total Attendance Count: {self.total_count}"
+    
+
+class Member(models.Model):
+    #name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    perfect_attendance = models.BooleanField(default=True, null=True, blank=True)  # True if attended all classes.
+    # perfect attendance automatically becomes false if student is not present on any day.
+    # it does not auto update to True if all attendance entries are updated to True
+    # but setting it as false it automatic
+
+
+class Attendance(models.Model):
+    student = models.ForeignKey(Member, on_delete=models.CASCADE)
+    date = models.DateField()
+    present = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.present:
+            student = Member.objects.get(id=self.student.id)
+            student.perfect_attendance = False
+            student.save()
+        super(Attendance, self).save(*args, **kwargs)

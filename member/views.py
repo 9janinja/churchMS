@@ -6,6 +6,13 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.utils import timezone
 
+import json
+import subprocess
+from django.urls import path, include
+from rest_framework.response import Response
+from rest_framework import routers, serializers, viewsets, views
+
+
 from .forms import MembershipForm
 from .models import Member, Attendance
 
@@ -75,7 +82,7 @@ def edit_member(request, pk):
         messages.success(request, "You need to login ...")
         return redirect('member_list')      
 
-def attendance_list(request):
+""" def attendance_list(request):
     #get all attendance records to display on html
     attendance = Attendance.objects.all()
     current_date = timezone.now().date()
@@ -84,7 +91,6 @@ def attendance_list(request):
 
     return render(request, 'attendance_list.html', {'attendance': attendance})
 
-'''
 def attendance(request):
     member = Member.objects.all()
     current_date = timezone.now().date()
@@ -102,27 +108,6 @@ def attendance(request):
         return redirect('attendance_summary')
     
     return render(request, 'addAttendance.html', {'member': member})
-'''
-def attendance(request):
-    member = Member.objects.all()
-    current_date = timezone.now().date()
-
-    if request.method == 'POST':
-        for member in member:
-            status = request.POST.get(str(member.id))
-            attendance, created = Attendance.objects.get_or_create(
-                member=member, date=current_date, defaults={'status': (status == 'present')}
-            )
-            if not created:
-                attendance.status = (status == 'present')
-                attendance.save()
-
-        return redirect('attendance_summary')
-
-    return render(request, 'addAttendance.html', {'member': member})
-
-
-
 
 
 def attendance_summary(request):
@@ -131,6 +116,102 @@ def attendance_summary(request):
         'present_count': present_count,
     }
     
-    return render(request, 'attendance_summary.html', context)
+    return render(request, 'attendance_summary.html', context) """
 
-  
+
+
+
+
+# no separate serializerspy file since it's only 2 serializers
+# and adding another file only makes it difficult to navigate in this tiny MT
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ['id', 'first_name','last_name', 'perfect_attendance']
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+
+    def get_member_name(self, obj):
+        return obj.member.first_name
+
+    member_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Attendance
+        fields = ['id', 'member', 'member_name', 'date', 'present']
+
+
+class MemberDetailsSerializer(serializers.ModelSerializer):
+    def get_attendance_record(self, obj):
+        return AttendanceSerializer(Attendance.objects.filter(member=obj), many=True).data
+
+    attendance_record = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Member
+        fields = ['id', 'first_name', 'perfect_attendance', 'attendance_record']
+
+
+class MemberViewSet(viewsets.ModelViewSet):  # crud
+    """
+        TO view attendace list of a particular student, go to \n http://127.0.0.1:8000/students/<STUDENT_ID>
+    """
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response(MemberDetailsSerializer(instance).data)
+
+
+class AttendanceViewSet(viewsets.ModelViewSet):  # crud
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+
+'''
+
+""" class ThreadingExampleView(views.APIView):
+    """
+        Use GET method to initiale multiprocess example using a function in this program.
+        The default get response is a rest api template
+        goto http://127.0.0.1:8000/threading_example?format=json for GETting plain JSON output.
+
+        Use POST method(without inputs) to initiate the mutiprocess example from a separate py script
+
+        Each element of the output is in the following format {process count: sum of two random numbers}
+    """
+
+    def is_valid_json(self, maybe_json):
+        try:
+            if type(maybe_json) is 'dict':
+                json.dumps(maybe_json)
+            elif type(maybe_json) is 'str':
+                json.loads(maybe_json)
+            else:
+                Exception('Input must be string or dict type')
+        except ValueError as err:
+            return False
+        return True
+
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        proc_result_dict = mtx.start_multiprocessing()
+        if self.is_valid_json(proc_result_dict):
+            return Response(proc_result_dict)
+        else:
+            raise Exception('Invalid JSON data received from child process.')
+
+    def post(self, request, format=None):
+        output_data = dict()
+        proc = subprocess.Popen(['python3', './crudsandthreads/multithreading_example.py', ], stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+        proc_result_str = proc.communicate()[0].rstrip()
+        if self.is_valid_json(proc_result_str):
+            return Response(proc_result_str)
+        else:
+            raise Exception('Invalid JSON data received from child process.')  """ 
+
+'''

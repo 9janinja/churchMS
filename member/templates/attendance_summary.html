@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Attendance Summary</h1>
+    <p>Total First Timer: {{ firsttimers_count }}</p>
+    <p>Members Present: {{ present_count }}</p>
+    <p>Total Attendance: {{total_attendance}}</p>  
+      
+{% endblock content %}

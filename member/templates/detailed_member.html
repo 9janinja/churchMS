@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<div class="col-md-6 offset-md-3">
+    <h1>{{ member }}</h1>
+</br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+                Email
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.email }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+                Address
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.address }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+                Phone Number
+                </div>
+            </div>
+            <div class=" card col-6">
+                <div class='card-body'>
+                {{ member.phone_number }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+               City
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.city }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+               Country
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.country }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+               Cell
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.cell }}
+                </div>
+            </div>
+        </div>
+    </br>
+        <div class="row justify-content-center">
+            <div class="card col-6">
+                <div class='card-body'>
+               Area
+                </div>
+            </div>
+            <div class="card col-6">
+                <div class='card-body'>
+                {{ member.Area }}
+                </div>
+            </div>
+        </div>
+    </br>
+    <div class="row justify-content-center">
+        <div class="card col-6">
+            <div class='card-body'>
+          Invited by
+            </div>
+        </div>
+        <div class="card col-6">
+            <div class='card-body'>
+            {{ member.invited_by }}
+            </div>
+        </div>
+    </div>
+</br>
+<div class="row justify-content-center">
+    <div class="card col-6">
+        <div class='card-body'>
+            Remarks
+        </div>
+    </div>
+    <div class="card col-6">
+        <div class='card-body'>
+        {{ member.remarks }}
+        </div>
+    </div>
+</div>
+</br>
+<div class="row justify-content-center">
+    <div class="card col-6">
+        <div class='card-body'>
+            Comment
+        </div>
+    </div>
+    <div class="card col-6">
+        <div class='card-body'>
+        {{ member.comment }}
+        </div>
+    </div>
+</div>
+</br>
+<div class="row justify-content-center">
+    <div class="card col-6">
+        <div class='card-body'>
+            Visitation Date
+        </div>
+    </div>
+    <div class="card col-6">
+        <div class='card-body'>
+        {{ member.day_to_be_visited }}
+        </div>
+    </div>
+</div>
+</br>
+<div class="row justify-content-center">
+    <div class="card col-6">
+        <div class='card-body'>
+            Visited
+        </div>
+    </div>
+    <div class="card col-6">
+        <div class='card-body'>
+        {{ member.visited }}
+        </div>
+    </div>
+</div>
+</br>
+<div class="row justify-content-center">
+    <div class="card col-6">
+        <div class='card-body'>
+            Readiness for NPA
+        </div>
+    </div>
+    <div class="card col-6">
+        <div class='card-body'>
+        {{ member.readiness_for_NPA }}
+        </div>
+    </div>
+</div>
+</br>
+<a href=" {% url 'member_list' %}" class='btn btn-secondary'>Back</a>
+<a href=" {% url 'delete_member' member.id %}" class='btn btn-danger'>Delete</a>
+<a href=" {% url 'edit' member.id %}" class='btn btn-secondary'>Edit</a>
+</div>
+</br>
+
+{% endblock %}
